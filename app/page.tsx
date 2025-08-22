@@ -48,20 +48,39 @@ export default function HomePage() {
     loadTracks()
   }, [])
 
+  useEffect(() => {
+    if (currentView === "home") {
+      loadTracks()
+    }
+  }, [currentView])
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadTracks()
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange)
+  }, [])
+
   const loadTracks = async () => {
     try {
+      console.log("[v0] Loading tracks from API...")
       const response = await fetch("/api/tracks")
       if (response.ok) {
         const data = await response.json()
-        const allTracks = [...data.tracks, ...sampleTracks] // объединяем загруженные и демо треки
+        console.log("[v0] Loaded tracks:", data.tracks?.length || 0)
+        const allTracks = [...(data.tracks || []), ...sampleTracks]
         setTracks(allTracks)
         audioPlayer.setQueue(allTracks, 0)
       } else {
-        // Fallback to sample tracks
+        console.log("[v0] API response not ok, using sample tracks")
         audioPlayer.setQueue(sampleTracks, 0)
       }
     } catch (error) {
-      console.error("Error loading tracks:", error)
+      console.error("[v0] Error loading tracks:", error)
       audioPlayer.setQueue(sampleTracks, 0)
     }
   }

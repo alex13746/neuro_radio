@@ -54,6 +54,12 @@ export function useAudioPlayer() {
   // Load and play track
   const loadTrack = useCallback(
     async (track: Track) => {
+      if (!track.audio_url || track.audio_url.includes("placeholder")) {
+        console.warn("[v0] Skipping track with invalid audio URL:", track.title)
+        setState((prev) => ({ ...prev, isLoading: false }))
+        return
+      }
+
       setState((prev) => ({ ...prev, isLoading: true }))
 
       try {
@@ -102,8 +108,13 @@ export function useAudioPlayer() {
         })
 
         audio.addEventListener("error", (e) => {
-          console.error("Audio error:", e)
-          setState((prev) => ({ ...prev, isLoading: false }))
+          console.error("[v0] Audio loading failed for:", track.title, "URL:", track.audio_url)
+          console.error("[v0] Audio error details:", e)
+          setState((prev) => ({
+            ...prev,
+            isLoading: false,
+            isPlaying: false,
+          }))
         })
 
         await audio.load()

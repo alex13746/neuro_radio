@@ -101,9 +101,7 @@ export default function UploadPage() {
         fileInputRef.current.value = ""
       }
 
-      setTimeout(() => {
-        router.push("/")
-      }, 1500)
+      router.push("/")
     } catch (error) {
       console.error("Upload error:", error)
       toast({

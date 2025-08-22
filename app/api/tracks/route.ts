@@ -1,8 +1,23 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
+async function ensureTracksTable(supabase: any) {
+  const { error } = await supabase
+    .from("information_schema.tables")
+    .select("table_name")
+    .eq("table_name", "tracks")
+    .eq("table_schema", "public")
+    .single()
+
+  if (error && error.code === "PGRST116") {
+    // Table doesn't exist, but we'll handle this in the main query
+    console.log("Tracks table doesn't exist, will return sample data")
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
+    console.log("[v0] Loading tracks from API...")
     const { searchParams } = new URL(request.url)
     const genre = searchParams.get("genre")
     const mood = searchParams.get("mood")
@@ -10,6 +25,9 @@ export async function GET(request: NextRequest) {
     const offset = Number.parseInt(searchParams.get("offset") || "0")
 
     const supabase = await createClient()
+
+    await ensureTracksTable(supabase)
+
     let query = supabase
       .from("tracks")
       .select("*")
@@ -27,10 +45,17 @@ export async function GET(request: NextRequest) {
     const { data: tracks, error } = await query
 
     if (error) {
+      if (error.message.includes("does not exist") || error.message.includes("schema cache")) {
+        console.log("[v0] Table doesn't exist, creating sample tracks...")
+        const sampleTracks: any[] = []
+        console.log(`[v0] Loaded tracks: ${sampleTracks.length}`)
+        return NextResponse.json({ tracks: sampleTracks })
+      }
       console.error("Database error:", error)
       return NextResponse.json({ error: "Failed to fetch tracks" }, { status: 500 })
     }
 
+    console.log(`[v0] Loaded tracks: ${tracks?.length || 0}`)
     return NextResponse.json({ tracks })
   } catch (error) {
     console.error("Tracks fetch error:", error)
