@@ -23,6 +23,14 @@ export function usePWA() {
     }
 
     if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => {
+          if (registration.scope.includes("/api/")) {
+            registration.unregister()
+          }
+        })
+      })
+
       navigator.serviceWorker
         .register("/sw.js")
         .then((registration) => {
