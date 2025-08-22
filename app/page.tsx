@@ -8,7 +8,6 @@ import { PlayerControls } from "@/components/player-controls"
 import { TrackInfo } from "@/components/track-info"
 import { PWAInstall } from "@/components/pwa-install"
 import { Navigation } from "@/components/navigation"
-import { MusicGenerator } from "@/components/music-generator"
 import { TrackLibrary } from "@/components/track-library"
 import { SettingsPanel } from "@/components/settings-panel"
 import { Button } from "@/components/ui/button"
@@ -41,19 +40,30 @@ const sampleTracks = [
 
 export default function HomePage() {
   const [currentView, setCurrentView] = useState("home")
+  const [tracks, setTracks] = useState<Track[]>(sampleTracks) // состояние для управления треками
   const audioPlayer = useAudioPlayer()
   const { isOnline, updateAvailable, updateApp } = usePWA()
 
   useEffect(() => {
-    // Initialize with sample tracks
-    audioPlayer.setQueue(sampleTracks, 0)
+    loadTracks()
   }, [])
 
-  const handleTrackGenerated = (track: Track) => {
-    // Add generated track to queue and play it
-    const newQueue = [track, ...audioPlayer.queue]
-    audioPlayer.setQueue(newQueue, 0)
-    setCurrentView("home")
+  const loadTracks = async () => {
+    try {
+      const response = await fetch("/api/tracks")
+      if (response.ok) {
+        const data = await response.json()
+        const allTracks = [...data.tracks, ...sampleTracks] // объединяем загруженные и демо треки
+        setTracks(allTracks)
+        audioPlayer.setQueue(allTracks, 0)
+      } else {
+        // Fallback to sample tracks
+        audioPlayer.setQueue(sampleTracks, 0)
+      }
+    } catch (error) {
+      console.error("Error loading tracks:", error)
+      audioPlayer.setQueue(sampleTracks, 0)
+    }
   }
 
   const handleTrackSelect = (track: Track) => {
@@ -76,8 +86,6 @@ export default function HomePage() {
     switch (currentView) {
       case "library":
         return <TrackLibrary onTrackSelect={handleTrackSelect} onQueueTracks={handleQueueTracks} />
-      case "generate":
-        return <MusicGenerator onTrackGenerated={handleTrackGenerated} />
       case "settings":
         return <SettingsPanel />
       case "favorites":

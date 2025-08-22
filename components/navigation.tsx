@@ -4,8 +4,9 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { HistoryDrawer } from "@/components/history-drawer"
-import { Menu, Home, Music, Sparkles, Settings, Heart, Download } from "lucide-react"
+import { Menu, Home, Music, Sparkles, Settings, Heart, Download, Upload } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 import type { Track } from "@/hooks/use-audio-player"
 
 interface NavigationProps {
@@ -17,18 +18,27 @@ interface NavigationProps {
 
 export function Navigation({ currentView, onViewChange, onTrackSelect, className }: NavigationProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
 
   const navItems = [
     { id: "home", label: "Главная", icon: Home },
     { id: "library", label: "Библиотека", icon: Music },
-    { id: "generate", label: "Генерация", icon: Sparkles },
+    { id: "upload", label: "Загрузить", icon: Upload, isRoute: true }, // добавлен пункт загрузки
+    { id: "generate", label: "Генерация", icon: Sparkles, isRoute: true }, // генерация теперь отдельная страница
     { id: "favorites", label: "Избранное", icon: Heart },
     { id: "downloads", label: "Загрузки", icon: Download },
     { id: "settings", label: "Настройки", icon: Settings },
   ]
 
   const handleNavClick = (viewId: string) => {
-    onViewChange(viewId)
+    const item = navItems.find((nav) => nav.id === viewId)
+
+    if (item?.isRoute) {
+      router.push(`/${viewId}`)
+    } else {
+      onViewChange(viewId)
+    }
+
     setIsOpen(false)
   }
 
@@ -36,16 +46,17 @@ export function Navigation({ currentView, onViewChange, onTrackSelect, className
     <>
       {/* Desktop Navigation */}
       <nav className={cn("hidden md:flex items-center space-x-2", className)}>
-        {navItems.slice(0, 4).map((item) => {
+        {navItems.slice(0, 5).map((item) => {
+          // показываем больше пунктов на десктопе
           const Icon = item.icon
           return (
             <Button
               key={item.id}
               variant={currentView === item.id ? "default" : "ghost"}
               size="sm"
-              onClick={() => onViewChange(item.id)}
+              onClick={() => handleNavClick(item.id)}
               className={cn(
-                "text-purple-200/70 hover:text-purple-100 hover:bg-transparent",
+                "text-gray-700 hover:text-purple-600 hover:bg-transparent", // улучшена контрастность
                 currentView === item.id && "bg-purple-600 text-white hover:bg-purple-700",
               )}
             >
@@ -60,9 +71,9 @@ export function Navigation({ currentView, onViewChange, onTrackSelect, className
         <Button
           variant={currentView === "settings" ? "default" : "ghost"}
           size="icon"
-          onClick={() => onViewChange("settings")}
+          onClick={() => handleNavClick("settings")}
           className={cn(
-            "text-purple-200/70 hover:text-purple-100 hover:bg-transparent",
+            "text-gray-700 hover:text-purple-600 hover:bg-transparent", // улучшена контрастность
             currentView === "settings" && "bg-purple-600 text-white hover:bg-purple-700",
           )}
         >
@@ -82,7 +93,7 @@ export function Navigation({ currentView, onViewChange, onTrackSelect, className
             <div className="space-y-4 mt-8">
               <div className="px-3 py-2">
                 <h2 className="text-lg font-semibold bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
-                  NeuroRadio
+                  НейроРадио
                 </h2>
               </div>
 
@@ -95,7 +106,7 @@ export function Navigation({ currentView, onViewChange, onTrackSelect, className
                       variant={currentView === item.id ? "default" : "ghost"}
                       onClick={() => handleNavClick(item.id)}
                       className={cn(
-                        "w-full justify-start text-purple-200/70 hover:text-purple-100 hover:bg-transparent",
+                        "w-full justify-start text-gray-700 hover:text-purple-600 hover:bg-transparent", // улучшена контрастность
                         currentView === item.id && "bg-purple-600 text-white hover:bg-purple-700",
                       )}
                     >

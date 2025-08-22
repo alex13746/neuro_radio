@@ -24,7 +24,7 @@ export function usePWA() {
 
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
-        .register("/api/sw.js")
+        .register("/sw.js")
         .then((registration) => {
           console.log("SW registered:", registration)
 
