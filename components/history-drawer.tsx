@@ -32,40 +32,8 @@ export function HistoryDrawer({ onTrackSelect, className }: HistoryDrawerProps) 
   const loadHistory = async () => {
     setIsLoading(true)
     try {
-      // Mock history data - in production, fetch from API
-      const mockHistory: HistoryItem[] = [
-        {
-          id: "1",
-          track: {
-            id: "1",
-            title: "Neon Dreams",
-            artist: "AI Composer",
-            album: "Digital Waves",
-            audio_url: "/placeholder.mp3",
-            cover_url: "/neon-synthwave-album-cover.png",
-            duration: 180,
-          },
-          listened_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
-          duration_played: 180,
-          completed: true,
-        },
-        {
-          id: "2",
-          track: {
-            id: "2",
-            title: "Cosmic Journey",
-            artist: "Neural Network",
-            album: "Space Odyssey",
-            audio_url: "/placeholder.mp3",
-            cover_url: "/cosmic-album-cover.png",
-            duration: 240,
-          },
-          listened_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-          duration_played: 120,
-          completed: false,
-        },
-      ]
-      setHistory(mockHistory)
+      // В продакшене здесь будет запрос к API
+      setHistory([])
     } catch (error) {
       console.error("Failed to load history:", error)
     } finally {

@@ -92,7 +92,7 @@ export default function UploadPage() {
 
       toast({
         title: "Трек успешно загружен!",
-        description: "Ваш трек появится в потоке на главной странице",
+        description: `"${formData.title}" добавлен в поток. Перейдите на главную страницу для прослушивания.`,
       })
 
       setFormData({ title: "", artist: "", album: "", description: "" })
@@ -101,7 +101,9 @@ export default function UploadPage() {
         fileInputRef.current.value = ""
       }
 
-      router.push("/")
+      setTimeout(() => {
+        router.push("/")
+      }, 2000)
     } catch (error) {
       console.error("Upload error:", error)
       toast({

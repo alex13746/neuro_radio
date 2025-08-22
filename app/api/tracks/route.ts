@@ -1,20 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
-async function ensureTracksTable(supabase: any) {
-  const { error } = await supabase
-    .from("information_schema.tables")
-    .select("table_name")
-    .eq("table_name", "tracks")
-    .eq("table_schema", "public")
-    .single()
-
-  if (error && error.code === "PGRST116") {
-    // Table doesn't exist, but we'll handle this in the main query
-    console.log("Tracks table doesn't exist, will return sample data")
-  }
-}
-
 export async function GET(request: NextRequest) {
   try {
     console.log("[v0] Loading tracks from API...")
@@ -26,7 +12,20 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient()
 
-    await ensureTracksTable(supabase)
+    const { data: tableExists, error: tableError } = await supabase
+      .from("information_schema.tables")
+      .select("table_name")
+      .eq("table_name", "tracks")
+      .eq("table_schema", "public")
+      .maybeSingle()
+
+    if (tableError || !tableExists) {
+      console.log("[v0] Tracks table doesn't exist, returning empty array")
+      return NextResponse.json({
+        tracks: [],
+        message: "База данных недоступна. Пожалуйста, выполните SQL скрипты для создания таблиц.",
+      })
+    }
 
     let query = supabase
       .from("tracks")
@@ -45,21 +44,23 @@ export async function GET(request: NextRequest) {
     const { data: tracks, error } = await query
 
     if (error) {
-      if (error.message.includes("does not exist") || error.message.includes("schema cache")) {
-        console.log("[v0] Table doesn't exist, creating sample tracks...")
-        const sampleTracks: any[] = []
-        console.log(`[v0] Loaded tracks: ${sampleTracks.length}`)
-        return NextResponse.json({ tracks: sampleTracks })
-      }
       console.error("Database error:", error)
-      return NextResponse.json({ error: "Failed to fetch tracks" }, { status: 500 })
+      console.log("[v0] Database query failed, returning empty tracks array")
+      return NextResponse.json({
+        tracks: [],
+        message: "База данных недоступна. Пожалуйста, выполните SQL скрипты для создания таблиц.",
+      })
     }
 
-    console.log(`[v0] Loaded tracks: ${tracks?.length || 0}`)
-    return NextResponse.json({ tracks })
+    console.log(`[v0] Successfully loaded ${tracks?.length || 0} tracks from database`)
+    return NextResponse.json({ tracks: tracks || [] })
   } catch (error) {
     console.error("Tracks fetch error:", error)
-    return NextResponse.json({ error: "Failed to fetch tracks" }, { status: 500 })
+    console.log("[v0] Catch block: returning empty tracks array")
+    return NextResponse.json({
+      tracks: [],
+      message: "База данных недоступна. Пожалуйста, выполните SQL скрипты для создания таблиц.",
+    })
   }
 }
 

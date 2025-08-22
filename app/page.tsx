@@ -16,31 +16,12 @@ import type { Track } from "@/hooks/use-audio-player"
 import "@fontsource/comfortaa"
 import "@fontsource/orbitron"
 
-// Sample tracks for demo
-const sampleTracks = [
-  {
-    id: "1",
-    title: "Neon Dreams",
-    artist: "AI Composer",
-    album: "Digital Waves",
-    audio_url: "/placeholder.mp3?duration=180&title=Neon Dreams",
-    cover_url: "/neon-synthwave-album-cover.png",
-    duration: 180,
-  },
-  {
-    id: "2",
-    title: "Cosmic Journey",
-    artist: "Neural Network",
-    album: "Space Odyssey",
-    audio_url: "/placeholder.mp3?duration=240&title=Cosmic Journey",
-    cover_url: "/cosmic-album-cover.png",
-    duration: 240,
-  },
-]
+// Sample tracks for demo - removed to prevent audio errors
+const sampleTracks: Track[] = []
 
 export default function HomePage() {
   const [currentView, setCurrentView] = useState("home")
-  const [tracks, setTracks] = useState<Track[]>(sampleTracks) // состояние для управления треками
+  const [tracks, setTracks] = useState<Track[]>([]) // Начинаем с пустого массива
   const audioPlayer = useAudioPlayer()
   const { isOnline, updateAvailable, updateApp } = usePWA()
 
@@ -71,17 +52,22 @@ export default function HomePage() {
       const response = await fetch("/api/tracks")
       if (response.ok) {
         const data = await response.json()
-        console.log("[v0] Loaded tracks:", data.tracks?.length || 0)
-        const allTracks = [...(data.tracks || []), ...sampleTracks]
+        console.log("[v0] API response:", data)
+        const allTracks = data.tracks || []
         setTracks(allTracks)
-        audioPlayer.setQueue(allTracks, 0)
+        if (allTracks.length > 0) {
+          audioPlayer.setQueue(allTracks, 0)
+        }
+        if (data.message) {
+          console.log("[v0] Database message:", data.message)
+        }
       } else {
-        console.log("[v0] API response not ok, using sample tracks")
-        audioPlayer.setQueue(sampleTracks, 0)
+        console.log("[v0] API response not ok, using empty tracks")
+        setTracks([])
       }
     } catch (error) {
       console.error("[v0] Error loading tracks:", error)
-      audioPlayer.setQueue(sampleTracks, 0)
+      setTracks([])
     }
   }
 
@@ -196,6 +182,31 @@ export default function HomePage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {tracks.length === 0 && (
+              <div className="text-center py-12">
+                <h3
+                  className="text-2xl font-bold mb-4 font-orbitron"
+                  style={{ color: "color-mix(in oklch, oklch(0.96 0.07 137.15) 90%, transparent)" }}
+                >
+                  Добро пожаловать в НейроРадио!
+                </h3>
+                <p className="text-purple-200/80 mb-6">
+                  Загрузите свои треки или сгенерируйте новую музыку с помощью ИИ
+                </p>
+                <p className="text-purple-200/60 text-sm mb-6">
+                  Примечание: Для полной функциональности выполните SQL скрипты для создания таблиц базы данных
+                </p>
+                <div className="flex justify-center space-x-4">
+                  <Button
+                    onClick={() => setCurrentView("library")}
+                    className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600"
+                  >
+                    Перейти к загрузке
+                  </Button>
                 </div>
               </div>
             )}

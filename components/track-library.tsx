@@ -39,28 +39,7 @@ export function TrackLibrary({ onTrackSelect, onQueueTracks, className }: TrackL
       setTracks(result.tracks)
     } catch (error) {
       console.error("Failed to load tracks:", error)
-      // Use mock data for demo
-      const mockTracks: Track[] = [
-        {
-          id: "1",
-          title: "Neon Dreams",
-          artist: "AI Composer",
-          album: "Digital Waves",
-          audio_url: "/placeholder.mp3",
-          cover_url: "/neon-synthwave-album-cover.png",
-          duration: 180,
-        },
-        {
-          id: "2",
-          title: "Cosmic Journey",
-          artist: "Neural Network",
-          album: "Space Odyssey",
-          audio_url: "/placeholder.mp3",
-          cover_url: "/cosmic-album-cover.png",
-          duration: 240,
-        },
-      ]
-      setTracks(mockTracks)
+      setTracks([])
     } finally {
       setIsLoading(false)
     }
