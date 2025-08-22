@@ -8,15 +8,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Upload, Music, Loader2 } from "lucide-react"
+import { ArrowLeft, Upload, Music } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
+import { VinylProgressBar } from "@/components/vinyl-progress-bar"
 
 export default function UploadPage() {
   const router = useRouter()
   const { toast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [formData, setFormData] = useState({
     title: "",
     artist: "",
@@ -56,9 +58,16 @@ export default function UploadPage() {
     }
 
     setIsUploading(true)
+    setUploadProgress(0)
 
     try {
-      // Create form data for upload
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 90) return prev
+          return prev + Math.random() * 10
+        })
+      }, 200)
+
       const uploadFormData = new FormData()
       uploadFormData.append("audio", selectedFile)
       uploadFormData.append("title", formData.title)
@@ -66,14 +75,17 @@ export default function UploadPage() {
       uploadFormData.append("album", formData.album || "Загруженные треки")
       uploadFormData.append("description", formData.description)
 
-      // Upload track
       const response = await fetch("/api/upload-track", {
         method: "POST",
         body: uploadFormData,
       })
 
+      clearInterval(progressInterval)
+      setUploadProgress(100)
+
       if (!response.ok) {
-        throw new Error("Ошибка загрузки")
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Ошибка загрузки")
       }
 
       const result = await response.json()
@@ -83,14 +95,12 @@ export default function UploadPage() {
         description: "Ваш трек появится в потоке на главной странице",
       })
 
-      // Reset form
       setFormData({ title: "", artist: "", album: "", description: "" })
       setSelectedFile(null)
       if (fileInputRef.current) {
         fileInputRef.current.value = ""
       }
 
-      // Redirect to home
       setTimeout(() => {
         router.push("/")
       }, 1500)
@@ -98,11 +108,12 @@ export default function UploadPage() {
       console.error("Upload error:", error)
       toast({
         title: "Ошибка загрузки",
-        description: "Не удалось загрузить трек. Попробуйте еще раз.",
+        description: error instanceof Error ? error.message : "Не удалось загрузить трек. Попробуйте еще раз.",
         variant: "destructive",
       })
     } finally {
       setIsUploading(false)
+      setUploadProgress(0)
     }
   }
 
@@ -219,23 +230,21 @@ export default function UploadPage() {
               </div>
 
               {/* Upload Button */}
-              <Button
-                onClick={handleUpload}
-                disabled={isUploading || !selectedFile || !formData.title}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
-              >
-                {isUploading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Загружаем...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4 mr-2" />
-                    Загрузить трек
-                  </>
-                )}
-              </Button>
+              {isUploading ? (
+                <div className="flex flex-col items-center space-y-4">
+                  <VinylProgressBar progress={uploadProgress} isLoading={isUploading} className="mx-auto" />
+                  <p className="text-purple-200 text-center">Загружаем ваш трек... {Math.round(uploadProgress)}%</p>
+                </div>
+              ) : (
+                <Button
+                  onClick={handleUpload}
+                  disabled={!selectedFile || !formData.title}
+                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Загрузить трек
+                </Button>
+              )}
 
               <p className="text-xs text-purple-200/60 text-center">
                 Поддерживаемые форматы: MP3, WAV, FLAC, OGG. Максимальный размер: 50MB

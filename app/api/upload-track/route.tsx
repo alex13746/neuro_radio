@@ -2,6 +2,51 @@ import { type NextRequest, NextResponse } from "next/server"
 import { put } from "@vercel/blob"
 import { createClient } from "@/lib/supabase/server"
 
+async function generateAlbumCover(title: string, artist: string) {
+  // Generate SVG album cover
+  const colors = [
+    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+    "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+    "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+    "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+  ]
+
+  const randomColor = colors[Math.floor(Math.random() * colors.length)]
+
+  const svg = `
+    <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          .title { font: bold 24px Arial, sans-serif; fill: white; text-anchor: middle; }
+          .artist { font: 18px Arial, sans-serif; fill: rgba(255,255,255,0.8); text-anchor: middle; }
+        </style>
+      </defs>
+      <rect width="400" height="400" fill="url(#grad)"/>
+      <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <circle cx="200" cy="200" r="150" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+      <circle cx="200" cy="200" r="100" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      <circle cx="200" cy="200" r="50" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <circle cx="200" cy="200" r="20" fill="rgba(0,0,0,0.3)"/>
+      <text x="200" y="180" class="title">${title.slice(0, 20)}</text>
+      <text x="200" y="220" class="artist">${artist.slice(0, 25)}</text>
+    </svg>
+  `
+
+  const buffer = Buffer.from(svg)
+  const blob = await put(`covers/${Date.now()}-cover.svg`, buffer, {
+    access: "public",
+    contentType: "image/svg+xml",
+  })
+
+  return blob
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
@@ -26,11 +71,12 @@ export async function POST(request: NextRequest) {
     })
 
     // Generate album cover
-    const coverBlob = await generateAlbumCover(title, artist)
+    const coverBlob = await generateAlbumCover(title, artist || "Неизвестный исполнитель")
 
     // Get audio duration (simplified - in real app you'd use audio processing library)
     const duration = 180 // Default duration, should be extracted from audio file
 
+    // Create Supabase client
     const supabase = await createClient()
 
     // Save track to database
@@ -64,64 +110,5 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Upload error:", error)
     return NextResponse.json({ error: "Ошибка загрузки файла" }, { status: 500 })
-  }
-}
-
-async function generateAlbumCover(title: string, artist: string): Promise<{ url: string }> {
-  try {
-    // Generate SVG album cover
-    const svg = `
-      <svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="vinylGradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
-            <stop offset="30%" style="stop-color:#16213e;stop-opacity:1" />
-            <stop offset="70%" style="stop-color:#0f3460;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#533483;stop-opacity:1" />
-          </radialGradient>
-          <radialGradient id="labelGradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
-          </radialGradient>
-        </defs>
-        
-        <!-- Vinyl Record -->
-        <circle cx="200" cy="200" r="200" fill="url(#vinylGradient)" />
-        
-        <!-- Grooves -->
-        <circle cx="200" cy="200" r="180" fill="none" stroke="#ffffff" strokeWidth="0.5" opacity="0.1" />
-        <circle cx="200" cy="200" r="160" fill="none" stroke="#ffffff" strokeWidth="0.5" opacity="0.1" />
-        <circle cx="200" cy="200" r="140" fill="none" stroke="#ffffff" strokeWidth="0.5" opacity="0.1" />
-        <circle cx="200" cy="200" r="120" fill="none" stroke="#ffffff" strokeWidth="0.5" opacity="0.1" />
-        <circle cx="200" cy="200" r="100" fill="none" stroke="#ffffff" strokeWidth="0.5" opacity="0.1" />
-        
-        <!-- Center Label -->
-        <circle cx="200" cy="200" r="80" fill="url(#labelGradient)" />
-        <circle cx="200" cy="200" r="8" fill="#1a1a2e" />
-        
-        <!-- Text -->
-        <text x="200" y="180" textAnchor="middle" fill="white" fontFamily="Arial, sans-serif" fontSize="16" fontWeight="bold">
-          ${title.substring(0, 20)}${title.length > 20 ? "..." : ""}
-        </text>
-        <text x="200" y="200" textAnchor="middle" fill="white" fontFamily="Arial, sans-serif" fontSize="12" opacity="0.8">
-          ${artist.substring(0, 25)}${artist.length > 25 ? "..." : ""}
-        </text>
-        <text x="200" y="220" textAnchor="middle" fill="white" fontFamily="Arial, sans-serif" fontSize="10" opacity="0.6">
-          НейроРадио
-        </text>
-      </svg>
-    `
-
-    // Convert SVG to blob and upload
-    const svgBlob = new Blob([svg], { type: "image/svg+xml" })
-    const coverBlob = await put(`covers/${Date.now()}-${title.replace(/[^a-zA-Z0-9]/g, "_")}.svg`, svgBlob, {
-      access: "public",
-    })
-
-    return coverBlob
-  } catch (error) {
-    console.error("Cover generation error:", error)
-    // Return default cover
-    return { url: "/neon-synthwave-album-cover.png" }
   }
 }

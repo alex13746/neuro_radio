@@ -1,5 +1,3 @@
-export async function GET() {
-  const swContent = `
 const CACHE_NAME = "neuroradio-v1"
 const STATIC_CACHE = "neuroradio-static-v1"
 const AUDIO_CACHE = "neuroradio-audio-v1"
@@ -179,13 +177,4 @@ async function handlePageRequest(request) {
     // Return offline page
     return caches.match("/offline") || new Response("Offline", { status: 503 })
   }
-}
-`
-
-  return new Response(swContent, {
-    headers: {
-      "Content-Type": "application/javascript",
-      "Cache-Control": "no-cache",
-    },
-  })
 }
