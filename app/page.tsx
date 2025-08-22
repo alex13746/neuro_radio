@@ -1,0 +1,235 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { useAudioPlayer } from "@/hooks/use-audio-player"
+import { usePWA } from "@/hooks/use-pwa"
+import { VinylRecord } from "@/components/vinyl-record"
+import { PlayerControls } from "@/components/player-controls"
+import { TrackInfo } from "@/components/track-info"
+import { PWAInstall } from "@/components/pwa-install"
+import { Navigation } from "@/components/navigation"
+import { MusicGenerator } from "@/components/music-generator"
+import { TrackLibrary } from "@/components/track-library"
+import { SettingsPanel } from "@/components/settings-panel"
+import { Button } from "@/components/ui/button"
+import { WifiOff, RefreshCw } from "lucide-react"
+import type { Track } from "@/hooks/use-audio-player"
+import "@fontsource/comfortaa"
+import "@fontsource/orbitron"
+
+// Sample tracks for demo
+const sampleTracks = [
+  {
+    id: "1",
+    title: "Neon Dreams",
+    artist: "AI Composer",
+    album: "Digital Waves",
+    audio_url: "/placeholder.mp3?duration=180&title=Neon Dreams",
+    cover_url: "/neon-synthwave-album-cover.png",
+    duration: 180,
+  },
+  {
+    id: "2",
+    title: "Cosmic Journey",
+    artist: "Neural Network",
+    album: "Space Odyssey",
+    audio_url: "/placeholder.mp3?duration=240&title=Cosmic Journey",
+    cover_url: "/cosmic-album-cover.png",
+    duration: 240,
+  },
+]
+
+export default function HomePage() {
+  const [currentView, setCurrentView] = useState("home")
+  const audioPlayer = useAudioPlayer()
+  const { isOnline, updateAvailable, updateApp } = usePWA()
+
+  useEffect(() => {
+    // Initialize with sample tracks
+    audioPlayer.setQueue(sampleTracks, 0)
+  }, [])
+
+  const handleTrackGenerated = (track: Track) => {
+    // Add generated track to queue and play it
+    const newQueue = [track, ...audioPlayer.queue]
+    audioPlayer.setQueue(newQueue, 0)
+    setCurrentView("home")
+  }
+
+  const handleTrackSelect = (track: Track) => {
+    // Find track in current queue or add it
+    const trackIndex = audioPlayer.queue.findIndex((t) => t.id === track.id)
+    if (trackIndex >= 0) {
+      audioPlayer.setQueue(audioPlayer.queue, trackIndex)
+    } else {
+      audioPlayer.setQueue([track, ...audioPlayer.queue], 0)
+    }
+    setCurrentView("home")
+  }
+
+  const handleQueueTracks = (tracks: Track[]) => {
+    audioPlayer.setQueue(tracks, 0)
+    setCurrentView("home")
+  }
+
+  const renderCurrentView = () => {
+    switch (currentView) {
+      case "library":
+        return <TrackLibrary onTrackSelect={handleTrackSelect} onQueueTracks={handleQueueTracks} />
+      case "generate":
+        return <MusicGenerator onTrackGenerated={handleTrackGenerated} />
+      case "settings":
+        return <SettingsPanel />
+      case "favorites":
+        return (
+          <div className="text-center py-12">
+            <h2
+              className="text-2xl font-bold mb-4"
+              style={{ color: "color-mix(in oklch, oklch(0.96 0.07 137.15) 90%, transparent)" }}
+            >
+              Избранное
+            </h2>
+            <p className="text-purple-200/80">Ваши любимые треки появятся здесь</p>
+          </div>
+        )
+      case "downloads":
+        return (
+          <div className="text-center py-12">
+            <h2
+              className="text-2xl font-bold mb-4"
+              style={{ color: "color-mix(in oklch, oklch(0.96 0.07 137.15) 90%, transparent)" }}
+            >
+              Загрузки
+            </h2>
+            <p className="text-purple-200/80">Ваши скачанные треки появятся здесь</p>
+          </div>
+        )
+      default:
+        return (
+          <div className="space-y-12">
+            {/* Header */}
+            <div className="text-center">
+              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 bg-clip-text text-transparent mb-4 font-comfortaa">
+                НейроРадио 24/7
+              </h1>
+              <p
+                className="text-xl text-purple-200/90 font-medium font-orbitron"
+                style={{ color: "color-mix(in oklch, oklch(0.96 0.07 137.15) 90%, transparent)" }}
+              >
+                ИИ-генерируемая Lo-Fi музыка
+              </p>
+            </div>
+
+            {/* Vinyl Record */}
+            <div className="flex justify-center">
+              <VinylRecord coverUrl={audioPlayer.currentTrack?.cover_url} isPlaying={audioPlayer.isPlaying} size="lg" />
+            </div>
+
+            {/* Track Info */}
+            <TrackInfo track={audioPlayer.currentTrack} />
+
+            {/* Player Controls */}
+            <div className="max-w-2xl mx-auto">
+              <PlayerControls
+                isPlaying={audioPlayer.isPlaying}
+                currentTime={audioPlayer.currentTime}
+                duration={audioPlayer.duration}
+                volume={audioPlayer.volume}
+                isLoading={audioPlayer.isLoading}
+                onTogglePlay={audioPlayer.togglePlay}
+                onSeek={audioPlayer.seek}
+                onVolumeChange={audioPlayer.setVolume}
+                onPrevious={audioPlayer.playPrevious}
+                onNext={audioPlayer.playNext}
+                onLike={() => console.log("Like track")}
+                onDownload={() => console.log("Download track")}
+                onShare={() => console.log("Share track")}
+              />
+            </div>
+
+            {/* Queue Preview */}
+            {audioPlayer.queue.length > 0 && (
+              <div>
+                <h3
+                  className="text-2xl font-bold text-center mb-8 font-orbitron"
+                  style={{ color: "color-mix(in oklch, oklch(0.96 0.07 137.15) 90%, transparent)" }}
+                >
+                  Далее
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                  {audioPlayer.queue.slice(audioPlayer.currentIndex + 1, audioPlayer.currentIndex + 3).map((track) => (
+                    <div
+                      key={track.id}
+                      className="flex items-center space-x-4 p-4 rounded-lg bg-card/50 backdrop-blur-sm border border-purple-500/20"
+                    >
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-600 to-purple-800 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{track.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-black">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Top Navigation */}
+          <div className="flex items-center justify-between mb-8">
+            <Navigation currentView={currentView} onViewChange={setCurrentView} onTrackSelect={handleTrackSelect} />
+          </div>
+
+          {/* Status Indicators */}
+          <div className="space-y-4 mb-6">
+            {/* Offline Indicator */}
+            {!isOnline && (
+              <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <WifiOff className="w-5 h-5 text-yellow-500" />
+                  <span className="text-yellow-500">Вы офлайн - воспроизводится кэшированная музыка</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.reload()}
+                  className="border-yellow-500/20 text-yellow-500 hover:bg-yellow-500/10"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Повторить
+                </Button>
+              </div>
+            )}
+
+            {/* Update Available */}
+            {updateAvailable && (
+              <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center justify-between">
+                <span className="text-blue-400">Доступна новая версия NeuroRadio!</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={updateApp}
+                  className="border-blue-500/20 text-blue-400 hover:bg-blue-500/10 bg-transparent"
+                >
+                  Обновить
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Main Content */}
+          {renderCurrentView()}
+        </div>
+      </div>
+
+      {/* PWA Install Prompt */}
+      <PWAInstall />
+    </div>
+  )
+}

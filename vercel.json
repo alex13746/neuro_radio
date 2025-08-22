@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/generate-music",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-old-tracks",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}
