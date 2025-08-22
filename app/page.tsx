@@ -197,17 +197,32 @@ export default function HomePage() {
                 <p className="text-purple-200/80 mb-6">
                   Загрузите свои треки или сгенерируйте новую музыку с помощью ИИ
                 </p>
-                <p className="text-purple-200/60 text-sm mb-6">
-                  Примечание: Для полной функциональности выполните SQL скрипты для создания таблиц базы данных
-                </p>
                 <div className="flex justify-center space-x-4">
                   <Button
-                    onClick={() => setCurrentView("library")}
+                    onClick={() => (window.location.href = "/upload")}
                     className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600"
                   >
-                    Перейти к загрузке
+                    Загрузить трек
+                  </Button>
+                  <Button
+                    onClick={() => (window.location.href = "/generate")}
+                    variant="outline"
+                    className="border-purple-500/20 text-purple-400 hover:bg-purple-500/10"
+                  >
+                    Сгенерировать музыку
                   </Button>
                 </div>
+              </div>
+            )}
+
+            {tracks.length > 0 && (
+              <div className="text-center py-8">
+                <Button
+                  onClick={() => (window.location.href = "/upload")}
+                  className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600"
+                >
+                  Загрузить еще треки
+                </Button>
               </div>
             )}
           </div>

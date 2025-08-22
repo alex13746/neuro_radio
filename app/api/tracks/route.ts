@@ -12,21 +12,6 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient()
 
-    const { data: tableExists, error: tableError } = await supabase
-      .from("information_schema.tables")
-      .select("table_name")
-      .eq("table_name", "tracks")
-      .eq("table_schema", "public")
-      .maybeSingle()
-
-    if (tableError || !tableExists) {
-      console.log("[v0] Tracks table doesn't exist, returning empty array")
-      return NextResponse.json({
-        tracks: [],
-        message: "База данных недоступна. Пожалуйста, выполните SQL скрипты для создания таблиц.",
-      })
-    }
-
     let query = supabase
       .from("tracks")
       .select("*")
@@ -46,10 +31,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error("Database error:", error)
       console.log("[v0] Database query failed, returning empty tracks array")
-      return NextResponse.json({
-        tracks: [],
-        message: "База данных недоступна. Пожалуйста, выполните SQL скрипты для создания таблиц.",
-      })
+      return NextResponse.json({ tracks: [] })
     }
 
     console.log(`[v0] Successfully loaded ${tracks?.length || 0} tracks from database`)
@@ -57,10 +39,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Tracks fetch error:", error)
     console.log("[v0] Catch block: returning empty tracks array")
-    return NextResponse.json({
-      tracks: [],
-      message: "База данных недоступна. Пожалуйста, выполните SQL скрипты для создания таблиц.",
-    })
+    return NextResponse.json({ tracks: [] })
   }
 }
 

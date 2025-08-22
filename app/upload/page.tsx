@@ -119,6 +119,24 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-black">
+      {/* Progress Bar */}
+      {isUploading && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-purple-900/90 backdrop-blur-sm border-b border-purple-500/20">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              <span className="text-purple-200 text-sm font-medium">Загружаем трек...</span>
+              <span className="text-purple-200 text-sm">{Math.round(uploadProgress)}%</span>
+            </div>
+            <div className="w-full bg-purple-900/50 rounded-full h-2 mt-2">
+              <div
+                className="bg-gradient-to-r from-purple-500 to-purple-400 h-2 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
