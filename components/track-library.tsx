@@ -85,7 +85,7 @@ export function TrackLibrary({ onTrackSelect, onQueueTracks, className }: TrackL
     <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Библиотека музыки</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Библиотека музыки</h2>
         <Button
           onClick={handlePlayAll}
           disabled={filteredTracks.length === 0}
@@ -176,14 +176,12 @@ export function TrackLibrary({ onTrackSelect, onQueueTracks, className }: TrackL
                 {/* Track Info */}
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium truncate">{track.title}</h4>
-                  <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
-                  {track.album && <p className="text-xs text-muted-foreground truncate">{track.album}</p>}
+                  <p className="text-sm text-gray-600 truncate">{track.artist}</p>
+                  {track.album && <p className="text-xs text-gray-600 truncate">{track.album}</p>}
                 </div>
 
                 {/* Duration */}
-                <div className="text-sm text-muted-foreground">
-                  {track.duration ? formatDuration(track.duration) : "--:--"}
-                </div>
+                <div className="text-sm text-gray-600">{track.duration ? formatDuration(track.duration) : "--:--"}</div>
 
                 {/* Actions */}
                 <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">

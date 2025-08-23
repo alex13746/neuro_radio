@@ -169,7 +169,7 @@ export default function UploadPage() {
             <CardContent className="space-y-6">
               {/* File Upload */}
               <div className="space-y-2">
-                <Label htmlFor="audio-file" className="text-purple-200">
+                <Label htmlFor="audio-file" className="text-gray-800 font-medium">
                   Аудио файл *
                 </Label>
                 <div className="flex items-center space-x-4">
@@ -196,7 +196,7 @@ export default function UploadPage() {
               {/* Track Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-purple-200">
+                  <Label htmlFor="title" className="text-gray-800 font-medium">
                     Название трека *
                   </Label>
                   <Input
@@ -208,7 +208,7 @@ export default function UploadPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="artist" className="text-purple-200">
+                  <Label htmlFor="artist" className="text-gray-800 font-medium">
                     Исполнитель
                   </Label>
                   <Input
@@ -222,7 +222,7 @@ export default function UploadPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="album" className="text-purple-200">
+                <Label htmlFor="album" className="text-gray-800 font-medium">
                   Альбом
                 </Label>
                 <Input
@@ -235,7 +235,7 @@ export default function UploadPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-purple-200">
+                <Label htmlFor="description" className="text-gray-800 font-medium">
                   Описание
                 </Label>
                 <Textarea

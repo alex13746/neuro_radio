@@ -73,23 +73,25 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Автовоспроизведение следующего трека</Label>
-              <p className="text-sm text-muted-foreground">Автоматически воспроизводить следующий трек в очереди</p>
+              <Label className="text-gray-800 font-medium">Автовоспроизведение следующего трека</Label>
+              <p className="text-sm text-gray-600">Автоматически воспроизводить следующий трек в очереди</p>
             </div>
             <Switch checked={settings.autoPlay} onCheckedChange={(checked) => updateSetting("autoPlay", checked)} />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Кроссфейд между треками</Label>
-              <p className="text-sm text-muted-foreground">Плавные переходы между песнями</p>
+              <Label className="text-gray-800 font-medium">Кроссфейд между треками</Label>
+              <p className="text-sm text-gray-600">Плавные переходы между песнями</p>
             </div>
             <Switch checked={settings.crossfade} onCheckedChange={(checked) => updateSetting("crossfade", checked)} />
           </div>
 
           {settings.crossfade && (
             <div className="space-y-2">
-              <Label>Длительность кроссфейда: {settings.crossfadeDuration[0]}с</Label>
+              <Label className="text-gray-800 font-medium">
+                Длительность кроссфейда: {settings.crossfadeDuration[0]}с
+              </Label>
               <Slider
                 value={settings.crossfadeDuration}
                 onValueChange={(value) => updateSetting("crossfadeDuration", value)}
@@ -102,7 +104,7 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
           )}
 
           <div className="space-y-2">
-            <Label>Размер буфера: {settings.bufferSize[0]}с</Label>
+            <Label className="text-gray-800 font-medium">Размер буфера: {settings.bufferSize[0]}с</Label>
             <Slider
               value={settings.bufferSize}
               onValueChange={(value) => updateSetting("bufferSize", value)}
@@ -111,7 +113,7 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
               step={1}
               className="w-full"
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-gray-600">
               Большие значения обеспечивают лучшую стабильность, но используют больше памяти
             </p>
           </div>
@@ -130,8 +132,8 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Автогенерация музыки</Label>
-              <p className="text-sm text-muted-foreground">Автоматически генерировать новые треки в фоне</p>
+              <Label className="text-gray-800 font-medium">Автогенерация музыки</Label>
+              <p className="text-sm text-gray-600">Автоматически генерировать новые треки в фоне</p>
             </div>
             <Switch
               checked={settings.autoGenerate}
@@ -141,7 +143,9 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
 
           {settings.autoGenerate && (
             <div className="space-y-2">
-              <Label>Интервал генерации: {settings.generationInterval[0]} минут</Label>
+              <Label className="text-gray-800 font-medium">
+                Интервал генерации: {settings.generationInterval[0]} минут
+              </Label>
               <Slider
                 value={settings.generationInterval}
                 onValueChange={(value) => updateSetting("generationInterval", value)}
@@ -166,7 +170,7 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label>Качество загрузки</Label>
+            <Label className="text-gray-800 font-medium">Качество загрузки</Label>
             <Select value={settings.downloadQuality} onValueChange={(value) => updateSetting("downloadQuality", value)}>
               <SelectTrigger>
                 <SelectValue />
@@ -193,7 +197,7 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label>Тема</Label>
+            <Label className="text-gray-800 font-medium">Тема</Label>
             <Select value={settings.theme} onValueChange={(value) => updateSetting("theme", value)}>
               <SelectTrigger>
                 <SelectValue />
@@ -220,8 +224,8 @@ export function SettingsPanel({ className }: SettingsPanelProps) {
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Push-уведомления</Label>
-              <p className="text-sm text-muted-foreground">Получать уведомления о новой сгенерированной музыке</p>
+              <Label className="text-gray-800 font-medium">Push-уведомления</Label>
+              <p className="text-sm text-gray-600">Получать уведомления о новой сгенерированной музыке</p>
             </div>
             <Switch
               checked={settings.notifications}

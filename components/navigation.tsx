@@ -56,7 +56,7 @@ export function Navigation({ currentView, onViewChange, onTrackSelect, className
               size="sm"
               onClick={() => handleNavClick(item.id)}
               className={cn(
-                "text-gray-700 hover:text-purple-600 hover:bg-transparent", // улучшена контрастность
+                "text-gray-900 hover:text-purple-600 hover:bg-transparent", // улучшена контрастность
                 currentView === item.id && "bg-purple-600 text-white hover:bg-purple-700",
               )}
             >
@@ -73,7 +73,7 @@ export function Navigation({ currentView, onViewChange, onTrackSelect, className
           size="icon"
           onClick={() => handleNavClick("settings")}
           className={cn(
-            "text-gray-700 hover:text-purple-600 hover:bg-transparent", // улучшена контрастность
+            "text-gray-900 hover:text-purple-600 hover:bg-transparent", // улучшена контрастность
             currentView === "settings" && "bg-purple-600 text-white hover:bg-purple-700",
           )}
         >
@@ -106,7 +106,7 @@ export function Navigation({ currentView, onViewChange, onTrackSelect, className
                       variant={currentView === item.id ? "default" : "ghost"}
                       onClick={() => handleNavClick(item.id)}
                       className={cn(
-                        "w-full justify-start text-gray-700 hover:text-purple-600 hover:bg-transparent", // улучшена контрастность
+                        "w-full justify-start text-gray-900 hover:text-purple-600 hover:bg-transparent", // улучшена контрастность
                         currentView === item.id && "bg-purple-600 text-white hover:bg-purple-700",
                       )}
                     >

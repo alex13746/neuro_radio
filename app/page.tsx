@@ -178,7 +178,7 @@ export default function HomePage() {
                       <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-600 to-purple-800 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">{track.title}</p>
-                        <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
+                        <p className="text-xs text-gray-600 truncate">{track.artist}</p>
                       </div>
                     </div>
                   ))}

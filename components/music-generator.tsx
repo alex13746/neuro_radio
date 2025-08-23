@@ -117,7 +117,9 @@ export function MusicGenerator({ onTrackGenerated, className }: MusicGeneratorPr
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="prompt">Описание музыки</Label>
+          <Label htmlFor="prompt" className="text-gray-800 font-medium">
+            Описание музыки
+          </Label>
           <Textarea
             id="prompt"
             placeholder="Опишите музыку, которую хотите сгенерировать..."
@@ -128,7 +130,7 @@ export function MusicGenerator({ onTrackGenerated, className }: MusicGeneratorPr
         </div>
 
         <div className="space-y-2">
-          <Label>Быстрые пресеты</Label>
+          <Label className="text-gray-800 font-medium">Быстрые пресеты</Label>
           <div className="grid grid-cols-1 gap-2">
             {presetPrompts.map((preset, index) => (
               <Button
@@ -147,7 +149,7 @@ export function MusicGenerator({ onTrackGenerated, className }: MusicGeneratorPr
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Жанр</Label>
+            <Label className="text-gray-800 font-medium">Жанр</Label>
             <Select value={genre} onValueChange={setGenre}>
               <SelectTrigger>
                 <SelectValue />
@@ -164,7 +166,7 @@ export function MusicGenerator({ onTrackGenerated, className }: MusicGeneratorPr
           </div>
 
           <div className="space-y-2">
-            <Label>Настроение</Label>
+            <Label className="text-gray-800 font-medium">Настроение</Label>
             <Select value={mood} onValueChange={setMood}>
               <SelectTrigger>
                 <SelectValue />
@@ -182,7 +184,7 @@ export function MusicGenerator({ onTrackGenerated, className }: MusicGeneratorPr
         </div>
 
         <div className="space-y-2">
-          <Label>Стиль</Label>
+          <Label className="text-gray-800 font-medium">Стиль</Label>
           <Select value={style} onValueChange={setStyle}>
             <SelectTrigger>
               <SelectValue />
@@ -198,11 +200,11 @@ export function MusicGenerator({ onTrackGenerated, className }: MusicGeneratorPr
         </div>
 
         <div className="space-y-2">
-          <Label>
+          <Label className="text-gray-800 font-medium">
             Длительность: {Math.floor(duration[0] / 60)}:{(duration[0] % 60).toString().padStart(2, "0")}
           </Label>
           <Slider value={duration} onValueChange={setDuration} max={300} min={60} step={30} className="w-full" />
-          <div className="flex justify-between text-xs text-muted-foreground">
+          <div className="flex justify-between text-xs text-gray-600">
             <span>1:00</span>
             <span>5:00</span>
           </div>
